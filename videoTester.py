@@ -4,12 +4,12 @@ import numpy as np
 from keras.models import model_from_json
 from keras.preprocessing import image
 
-#load model
+#load model which is trained in Emotion_Analysis
 model = model_from_json(open("fer.json", "r").read())
 #load weights
 model.load_weights('fer.h5')
 
-
+#To detect Face we are using haar cascade 
 face_haar_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 
@@ -19,10 +19,12 @@ while True:
     ret,test_img=cap.read()# captures frame and returns boolean value and captured image
     if not ret:
         continue
-    gray_img= cv2.cvtColor(test_img, cv2.COLOR_BGR2GRAY)
+    gray_img= cv2.cvtColor(test_img, cv2.COLOR_BGR2GRAY) #converting it into standard format as our training dataset
 
     faces_detected = face_haar_cascade.detectMultiScale(gray_img, 1.32, 5)
+ 
 
+#Creating rectangle around the face detected and cropping ROI to detect emotion
 
     for (x,y,w,h) in faces_detected:
         cv2.rectangle(test_img,(x,y),(x+w,y+h),(255,0,0),thickness=7)
@@ -39,6 +41,8 @@ while True:
 
         emotions = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
         predicted_emotion = emotions[max_index]
+
+#Display the predicted_emotion on live camera
 
         cv2.putText(test_img, predicted_emotion, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
 
